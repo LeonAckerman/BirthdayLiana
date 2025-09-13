@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday - A Special Diary Entry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Homemade+Apple&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Caveat', cursive;
+            background-color: #f8f3e9;
+            color: #5d4037;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://www.transparenttextures.com/patterns/old-map.png');
+            opacity: 0.1;
+            z-index: -1;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .diary-cover {
+            width: 100%;
+            max-width: 600px;
+            margin: 40px auto;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .diary {
+            width: 100%;
+            min-height: 450px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+        }
+        .diary.flipped {
+            transform: rotateY(180deg);
+        }
+        .diary-page {
+            position: absolute;
+            width: 100%;
+            min-height: 450px;
+            backface-visibility: hidden;
+            border-radius: 5px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 30px;
+            background-color: #f9f5ed;
+            background-image: linear-gradient(#e6e2d8 1px, transparent 1px);
+            background-size: 100% 30px;
+        }
+        .diary-back {
+            transform: rotateY(180deg);
+            background-color: #f0e6d2;
+            background-image: linear-gradient(#e6dcc7 1px, transparent 1px);
+            background-size: 100% 30px;
+        }
+        .diary-title {
+            font-family: 'Homemade Apple', cursive;
+            font-size: 2.5rem;
+            color: #8d6e63;
+            margin-bottom: 20px;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #8d6e63;
+            animation: blink-caret 0.75s step-end infinite;
+            width: fit-content;
+            max-width: 100%;
+        }
+        .diary-date {
+            font-size: 1.2rem;
+            color: #a1887f;
+            margin-bottom: 30px;
+            text-align: right;
+            align-self: flex-end;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #a1887f;
+            animation: blink-caret 0.75s step-end infinite;
+            width: fit-content;
+            max-width: 100%;
+        }
+        .diary-content {
+            font-size: 1.8rem;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 20px;
+            overflow: hidden;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .diary-signature {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            align-self: flex-end;
+            margin-top: 20px;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #8d6e63;
+            animation: blink-caret 0.75s step-end infinite;
+            width: fit-content;
+            max-width: 100%;
+        }
+        .flip-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #8d6e63;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: inherit; }
+        }
+        
+        /* Modified layout for photo and text section - CSS GRID TEXT WRAPPING */
+        .photo-text-section {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            background-image: linear-gradient(#f0f0f0 1px, transparent 1px);
+            background-size: 100% 30px;
+            display: grid;
+            grid-template-columns: 140px 1fr; /* Photo column (LEFT) + text column (RIGHT) */
+            grid-template-rows: auto auto auto auto; /* Title, photo+text, remaining text, signature */
+            gap: 15px;
+        }
+        
+        .text-title {
+            font-family: 'Homemade Apple', cursive;
+            font-size: 1.6rem;
+            color: #8d6e63;
+            margin-bottom: 0;
+            text-align: center;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #8d6e63;
+            animation: blink-caret 0.75s step-end infinite;
+            width: fit-content;
+            max-width: 100%;
+            justify-self: center;
+            grid-column: 1 / -1; /* Span across all columns */
+        }
+        
+        .photo-container {
+            grid-column: 1; /* FIRST column (LEFT) */
+            grid-row: 2 / 4; /* Span multiple rows */
+            justify-self: start;
+        }
+        
+        .photo-frame {
+            width: 120px;
+            height: 150px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        .photo-frame:hover {
+            transform: rotate(0) scale(1.05);
+            z-index: 10;
+        }
+        .photo {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            filter: sepia(20%);
+        }
+        .photo-caption {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #8d6e63;
+        }
+        
+        .text-container {
+            display: contents; /* This makes the children participate in the grid */
+        }
+        
+        .text-content {
+            font-size: 1.2rem;
+            line-height: 1.4;
+            color: #5d4037;
+            margin-bottom: 0;
+            word-wrap: break-word;
+            text-align: justify;
+            grid-column: 2; /* SECOND column (RIGHT) next to photo */
+            grid-row: 2; /* Same row as photo start */
+        }
+        
+        .text-content-overflow {
+            font-size: 1.2rem;
+            line-height: 1.4;
+            color: #5d4037;
+            word-wrap: break-word;
+            text-align: justify;
+            grid-column: 1 / -1; /* Span full width below photo */
+            grid-row: 3;
+            margin-top: 10px;
+        }
+        
+        .text-signature {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.4rem;
+            margin-top: 8px;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #8d6e63;
+            animation: blink-caret 0.75s step-end infinite;
+            width: fit-content;
+            max-width: 100%;
+            justify-self: end;
+            grid-column: 1 / -1; /* Span all columns */
+            grid-row: 4;
+        }
+        
+        .birthday-wishes {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px auto;
+            background-color: #f9f5ed;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            background-image: linear-gradient(#e6e2d8 1px, transparent 1px);
+            background-size: 100% 30px;
+            box-sizing: border-box;
+        }
+        .wishes-title {
+            font-family: 'Homemade Apple', cursive;
+            font-size: 2.5rem;
+            color: #8d6e63;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .wishes-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+        }
+        .wish-card {
+            width: 280px; /* Increased from 220px */
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            padding: 25px; /* Increased padding for more space */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: rotate(var(--rotation));
+            transition: transform 0.3s ease;
+            position: relative;
+            box-sizing: border-box;
+        }
+        .wish-card:hover {
+            transform: rotate(0) scale(1.03);
+            z-index: 10;
+        }
+        .wish-icon {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background-color: #a1887f;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+        .wish-text {
+            font-size: 1.4rem; /* Slightly smaller to fit more text */
+            margin-top: 15px;
+            text-align: center;
+            line-height: 1.3; /* Tighter line height to fit more */
+            word-wrap: break-word;
+        }
+        .wish-author {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.4rem;
+            text-align: right;
+            margin-top: 10px;
+            color: #8d6e63;
+        }
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.2rem;
+            color: #8d6e63;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background-color: #f8bbd0;
+            position: absolute;
+            animation: confetti-fall 5s linear forwards;
+            opacity: 0;
+        }
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        .hidden {
+            display: none;
+        }
+        
+        /* Floating music button */
+        .music-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #8d6e63, #a1887f);
+            border: none;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .music-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .music-button:active {
+            transform: scale(0.95);
+        }
+        
+        /* Animation for music button */
+        .music-button.playing {
+            animation: pulse-music 1.5s infinite;
+        }
+        
+        @keyframes pulse-music {
+            0% {
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 15px rgba(141, 110, 99, 0.6), 0 0 0 10px rgba(141, 110, 99, 0.1);
+            }
+            100% {
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            }
+        }
+        
+        /* Hidden text initially for typing animation */
+        .typing-hidden {
+            opacity: 0;
+        }
+        
+        /* RESPONSIVE - Only apply to very small screens OR remove completely */
+        @media (max-width: 400px) { /* Changed from 768px to 400px - much smaller breakpoint */
+            .diary-title {
+                font-size: 2rem;
+            }
+            
+            .diary-content {
+                font-size: 1.5rem;
+            }
+            
+            /* Keep photo-text-section horizontal even on mobile */
+            /* COMMENTED OUT - this is what was making it vertical
+            .photo-text-section {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .photo-container {
+                flex: 0 0 auto;
+                width: 100%;
+                display: flex;
+                justify-content: center;
+            }
+            
+            .text-container {
+                padding-left: 0;
+                padding-top: 20px;
+            }
+            */
+            
+            .wish-card {
+                width: 250px; /* Smaller on mobile but still bigger than before */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <div class="container">
+        <div class="diary-cover" id="diaryCover">
+            <div class="diary" id="diary">
+                <div class="diary-page">
+                    <h1 class="diary-title" id="diaryTitle">Special Entry</h1>
+                    <div class="diary-date" id="currentDate"></div>
+                    <p class="diary-content" id="diaryContent">Selamat Ulang Tahun, say- Liana. Hari ini hari spesial kamu... Semoga impian, dan hal yang kamu mau sekarang terwujud ya.</p>
+                    <p class="diary-signature" id="diarySignature">With love,</p>
+                    <div class="flip-hint">Click to flip the page</div>
+                </div>
+                <div class="diary-page diary-back"><h1 class="diary-title" id="diaryTitleBack">Birthday Wishes</h1>
+                    <p class="diary-content" id="diaryContentBack">Juga buat seluruh keluarga kamu, semoga senantiasa diberi rezeki yang melimpah, terhindar dari segala marabahaya.</p>
+                    <div class="diary-signature" id="diarySignatureBack">Me</div>
+                    <div class="flip-hint">Click to flip back</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modified photo and text section - GRID LAYOUT WITH TEXT WRAPPING -->
+        <div class="photo-text-section">
+            <h2 class="text-title" id="sectionTitle">Birthday Memories</h2>
+            <div class="photo-container">
+                <div class="photo-frame">
+                    <div class="photo" style="background-image: url('liana.jpg');"></div>
+                    <div class="photo-caption">Special moments</div>
+                </div>
+            </div>
+            <div class="text-container">
+                <p class="text-content" id="sectionContent">
+                   Halo kamu, orang spesial yang pernah hadir di hidupku lewat cara yang tak pernah kuduga yang bahkan diluar ekspetasi aku...
+                </p>
+                <p class="text-content-overflow" id="sectionContentOverflow">
+                    Awalnya kita cuma sebatas teman di grup dan bahkan ga tau nama masing², bahkan jarak waktu sejak pertama kenal sampai akhirnya bisa sedekat sekarang tuh lama banget. Aku bahkan gak nyangka kalau kita bisa sampai di titik ini—dimana aku terbiasa sama chat kamu, sama keberadaan kamu, dan rasanya aneh kalau sehari aja gak ada kabar dari kamu.
+
+Aku masih inget momen kita bikin janji kecil, bukan tentang ketemu, tapi tentang sama-sama jadi pribadi yang lebih baik. Itu masih aku pegang sampai sekarang. Aku juga inget gimana kamu perlahan nunjukin rasa ke aku, sampai akhirnya aku berani bilang kalau aku juga mulai suka sama kamu. Tapi kamu tahu kan? Aku memilih kita gak pacaran dulu, bukan karena aku gak serius, justru karena aku terlalu serius. Aku pengen upgrade diri, jadi versi terbaikku, biar suatu hari nanti aku bisa hadir bukan cuma sebagai seseorang yang nemenin kamu lewat layar, tapi juga yang bener-bener ada di samping kamu li.
+
+Jadi, di hari spesial kamu ini… aku cuma mau bilang: terima kasih udah hadir, terima kasih udah bikin hari-hariku lebih berarti. Semoga semua doa baik selalu nyertai langkahmu, semoga kebahagiaan gak pernah jauh dari hidupmu, dan semoga janji kecil kita bisa jadi nyata suatu hari nanti.
+
+Selamat ulang tahun, sayang. 🕊️💙
+                </p>
+                <p class="text-signature" id="sectionSignature">With all my heart,</p>
+            </div>
+        </div>
+        
+        <div class="birthday-wishes">
+            <h2 class="wishes-title">Birthday Messages</h2>
+            <div class="wishes-container">
+                <div class="wish-card" style="--rotation: -2deg;">
+                    <div class="wish-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <p class="wish-text">Jangan jauhi ibadah ya li, hati² sama cwo diluar sana... termasuk gw sendiri.</p>
+                    <p class="wish-author">- Me</p>
+                </div>
+                <div class="wish-card" style="--rotation: 1deg;">
+                    <div class="wish-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <p class="wish-text">hbd bang lin.</p>
+                    <p class="wish-author">- Fahri</p>
+                </div>
+                <div class="wish-card" style="--rotation: 1deg;">
+                    <div class="wish-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <p class="wish-text">"hbd banglin, pendek umur buat lu. jan lupa in temen² yang ada di gc dulu. thanks buat lu yang dah nemenin gc dri 0 smpe ke titik puncak nya smpe kembali lagi menuruni puncaknya. maap gabisa ngasi quotes kece. tapi buat lu 4 tahun ini, gw ucapin makasih banyak banget. makasi juga buat pacar lu Zulfi yang dah ngasih gw kesempatan buat ngucapin ini"</p>
+                    <p class="wish-author">- Sultan</p>
+                </div>
+                <div class="wish-card" style="--rotation: -1deg;">
+                    <div class="wish-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="wish-text">happy birthday Lia selamat ulang tahun syehat selalu cepatlah kaya dan beri aku uang semoga yang disemogakan tersemogakan semoga di umur ini hal hal baik terjadi jangan terlalu memikirkan hidup ,intinya happy birthday semoga terjadi hal luar biasa yang indah di umur yang ini</p>
+                    <p class="wish-author">- Nesya</p>
+                </div>
+                <div class="wish-card" style="--rotation: 2deg;">
+                    <div class="wish-icon">
+                        <i class="fas fa-birthday-cake"></i>
+                    </div>
+                    <p class="wish-text">Happy birthday!!🥳 Ingat Lia, umur itu kayak kuota—semakin lama semakin berkurang, jadi nikmati aja selagi masih full🤭.</p>
+                    <p class="wish-author">- Reno</p>
+                </div>
+                <div class="wish-card" style="--rotation: 1deg;">
+                    <div class="wish-icon">
+                        <i class="fas fa-champagne-glasses"></i>
+                    </div>
+                    <p class="wish-text">hbd lia, best prayers for you. semoga umur km menjadi berkah, dilapangkan hatinya, diberi kesehatan,  keselamatan, dan ketabahan di perjalanan menuju kedewasaan. ga lupa aku mau bilang thanks to ur mother, karena uda melahirkan n merawat km. i wish, u n ur mother be given long life yaa. aamiin.</p>
+                    <p class="wish-author">- Tasya</p>
+                   
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <p>Made with ❤️ for a special birthday</p>
+    </div>
+    
+    <!-- Floating Music Button -->
+    <button class="music-button" id="musicButton">
+        <i class="fas fa-play" id="musicIcon"></i>
+    </button>
+    
+    <!-- Hidden audio element -->
+    <audio id="backgroundMusic" loop>
+        <source src="lovestory.mp3" type="audio/mp3">
+        
+    </audio>
+    <script>
+        // Music functionality
+        const musicButton = document.getElementById('musicButton');
+        const musicIcon = document.getElementById('musicIcon');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        let isPlaying = false;
+        
+        musicButton.addEventListener('click', function() {
+            if (isPlaying) {
+                backgroundMusic.pause();
+                musicIcon.classList.remove('fa-pause');
+                musicIcon.classList.add('fa-play');
+                musicButton.classList.remove('playing');
+                isPlaying = false;
+            } else {
+                backgroundMusic.play().catch(e => {
+                    console.log('Audio play failed:', e);
+                    // Fallback: create a simple tone using Web Audio API
+                    createSimpleMusic();
+                });
+                musicIcon.classList.remove('fa-play');
+                musicIcon.classList.add('fa-pause');
+                musicButton.classList.add('playing');
+                isPlaying = true;
+            }
+        });
+        
+        // Fallback music using Web Audio API
+        function createSimpleMusic() {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(440, audioContext.currentTime); // A note
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            
+            oscillator.start();
+            
+            // Create a simple melody pattern
+            let noteIndex = 0;
+            const notes = [440, 493.88, 523.25, 587.33, 659.25, 698.46, 783.99, 880]; // A major scale
+            
+            setInterval(() => {
+                if (isPlaying) {
+                    oscillator.frequency.setValueAtTime(notes[noteIndex % notes.length], audioContext.currentTime);
+                    noteIndex++;
+                }
+            }, 800);
+        }
+        
+        // Set current date
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateElement = document.getElementById('currentDate');
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            dateElement.textContent = today.toLocaleDateString('en-US', options);
+            
+            // Hide ONLY flip pages and text next to photo
+            // Diary pages (flip pages)
+            document.getElementById('diaryTitle').style.opacity = '0';
+            document.getElementById('currentDate').style.opacity = '0';
+            document.getElementById('diaryContent').innerHTML = '';
+            document.getElementById('diarySignature').style.opacity = '0';
+            
+            // Photo-text section - ALL text elements including below photo
+            document.getElementById('sectionTitle').style.opacity = '0';
+            document.getElementById('sectionContent').style.opacity = '0';
+            document.getElementById('sectionContentOverflow').style.opacity = '0'; // Hide text below photo too
+            document.getElementById('sectionSignature').style.opacity = '0';
+            
+            // Start typing animations for diary
+            setTimeout(() => {
+                document.getElementById('diaryTitle').style.opacity = '1';
+                typeWriter("diaryTitle", 100);
+            }, 500);
+            
+            setTimeout(() => {
+                document.getElementById('currentDate').style.opacity = '1';
+                typeWriter("currentDate", 50);
+            }, 2000);
+            
+            setTimeout(() => {
+                document.getElementById('diaryContent').style.opacity = '1';
+                typeWriterHTML("diaryContent", 30);
+            }, 3000);
+            
+            setTimeout(() => {
+                document.getElementById('diarySignature').style.opacity = '1';
+                typeWriter("diarySignature", 80);
+            }, 5500);
+            
+            // Start typing animations for photo-text section
+            setTimeout(() => {
+                document.getElementById('sectionTitle').style.opacity = '1';
+                typeWriter("sectionTitle", 100);
+            }, 6500);
+            
+            setTimeout(() => {
+                document.getElementById('sectionContent').style.opacity = '1';
+                typeWriter("sectionContent", 30);
+            }, 7500);
+            
+            // Add typing animation for text below photo
+            setTimeout(() => {
+                document.getElementById('sectionContentOverflow').style.opacity = '1';
+                typeWriter("sectionContentOverflow", 25);
+            }, 9000);
+            
+            setTimeout(() => {
+                document.getElementById('sectionSignature').style.opacity = '1';
+                typeWriter("sectionSignature", 80);
+            }, 11500);
+            
+            // Create confetti on page load
+            setTimeout(createConfetti, 13000);
+        });
+        
+        // Typing animation function
+        function typeWriter(elementId, speed) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            element.textContent = '';
+            let i = 0;
+            
+            function type() {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    // Remove cursor animation when typing is complete
+                    element.style.borderRight = 'none';
+                }
+            }
+            
+            type();
+        }
+        
+        // Typing animation for HTML content
+        function typeWriterHTML(elementId, speed) {
+            const element = document.getElementById(elementId);
+            const originalContent = "Selamat Ulang Tahun, say- Liana. Hari ini hari spesial kamu... Semua doa gw yang terbaik buat kamu Li.";
+            element.innerHTML = '';
+            let i = 0;
+            let tempHTML = '';
+            
+            function type() {
+                if (i < originalContent.length) {
+                    if (originalContent.substr(i, 4) === '<br>') {
+                        tempHTML += '<br>';
+                        i += 4;
+                    } else {
+                        tempHTML += originalContent.charAt(i);
+                        i++;
+                    }
+                    element.innerHTML = tempHTML;
+                    setTimeout(type, speed);
+                }
+            }
+            
+            type();
+        }
+        
+        // Diary flip functionality
+        const diaryCover = document.getElementById('diaryCover');
+        const diary = document.getElementById('diary');
+        diaryCover.addEventListener('click', function() {
+            diary.classList.toggle('flipped');
+            
+            // If flipping to the back page, start typing animations for back page
+            if (diary.classList.contains('flipped')) {
+                setTimeout(() => typeWriter("diaryTitleBack", 100), 500);
+                setTimeout(() => typeWriter("diaryContentBack", 30), 1500);
+                setTimeout(() => typeWriter("diarySignatureBack", 80), 3500);
+            }
+        });
+        
+        // Confetti effect
+        function createConfetti() {
+            const colors = ['#f8bbd0', '#e1bee7', '#c5cae9', '#b3e5fc', '#c8e6c9', '#fff9c4', '#ffccbc'];
+            
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    
+                    // Random properties
+                    const size = Math.random() * 10 + 5;
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    const left = Math.random() * 100;
+                    const animationDuration = Math.random() * 3 + 2;
+                    
+                    confetti.style.width = `${size}px`;
+                    confetti.style.height = `${size}px`;
+                    confetti.style.backgroundColor = color;
+                    confetti.style.left = `${left}%`;
+                    confetti.style.animationDuration = `${animationDuration}s`;
+                    
+                    document.body.appendChild(confetti);
+                    
+                    // Remove confetti after animation completes
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, animationDuration * 1000);
+                }, i * 30);
+            }
+        }
+    </script>
+</body>
+</html>
